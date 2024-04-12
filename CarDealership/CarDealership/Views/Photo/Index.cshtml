@@ -1,0 +1,40 @@
+﻿@model IEnumerable<IGrouping<int, CarDealership.Models.Photo>>
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<div class="container" style="min-height:75vh;">
+    <h2>Списък със Снимки</h2>
+
+    <div id="accordion">
+        @foreach (var carGroup in Model)
+        {
+            <div class="card">
+                <div class="card-header" id="heading@(carGroup.Key)">
+                    <h5 class="mb-0">
+                        <button class="btn" data-toggle="collapse" data-target="#collapse@(carGroup.Key)" aria-expanded="true" aria-controls="collapse@(carGroup.Key)">
+                            Кола с ID: @(carGroup.Key)
+                        </button>
+                    </h5>
+                </div>
+
+                <div id="collapse@(carGroup.Key)" class="collapse" aria-labelledby="heading@(carGroup.Key)" data-parent="#accordion">
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var photo in carGroup)
+                            {
+                                <div class="col-md-3 mb-3">
+                                    <img src="@photo.Url" class="img-fluid" alt="Photo">
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <a asp-action="Create" class="btn btn-success mt-3">Добави Нова Снимка</a>
+</div>
