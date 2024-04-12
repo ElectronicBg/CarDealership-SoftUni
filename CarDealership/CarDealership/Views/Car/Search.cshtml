@@ -1,5 +1,5 @@
 ﻿@using CarDealership.Helpers
-@using CarDealership.Models.Enums
+@using CarDealership.Data.Enums
 @model CarDealership.ViewModel.SearchViewModel
 @{
     ViewData["Title"] = "Search";
@@ -77,7 +77,7 @@
                         </div>
 
                         <div class="form-group">
-                            <select asp-for="Region" asp-items="Html.GetEnumSelectList<CarDealership.Models.Enums.Region>()" class="form-select">
+                            <select asp-for="Region" asp-items="Html.GetEnumSelectList<CarDealership.Data.Enums.Region>()" class="form-select">
                                 <option value="">Избери Област</option>
                             </select>
                         </div>
