@@ -1,0 +1,165 @@
+﻿@using CarDealership.Helpers
+@model IEnumerable<CarDealership.Models.Car>
+@{
+    ViewData["Title"] = "Cars List";
+}
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<div class="container">
+    <div class="d-flex justify-content-end mb-3">
+        <a asp-action="Create" asp-controller="Car" class="btn btn-success d-flex align-items-center border-0" style="background-color:#3DC26A">
+            Добави Нова Кола
+            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" class="ps-2" viewBox="0 0 448 512"><path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" /></svg>
+        </a>
+    </div>
+
+    <div class="row">
+        @foreach (var car in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="@car.Photos.FirstOrDefault()?.Url" class="card-img-top img-fluid" alt="Car Photo" style="height: 250px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@car.Brand.Name @car.Model.Name</h5>
+                        <p class="card-text">
+                            <strong>Тип на двигателя:</strong> @EnumHelper.GetDisplayName(car.EngineType)<br>
+                            <strong>Тип на скоростната кутия:</strong> @EnumHelper.GetDisplayName(car.TransmissionType)<br>
+                            <strong>Цвят на колата:</strong> @car.CarColor.Name<br>
+                            <strong>Регион:</strong> @EnumHelper.GetDisplayName(car.Region)<br>
+                            <strong>Година:</strong> @car.Year г.<br>
+                            <strong>Пробег:</strong> @car.Mileage км.<br>
+                            <strong>Мощност:</strong> @car.Power<br>
+                            <strong>Тип на колата:</strong> @EnumHelper.GetDisplayName(car.CarType)<br>
+                            <strong>Състояние:</strong> @EnumHelper.GetDisplayName(car.Condition)<br>
+                            <strong>Цена:</strong> @car.Price лв.
+                        </p>
+
+                        <div class="d-flex justify-content-between ">
+                            <a href="#" class="btn btn-primary d-flex align-items-center" data-toggle="modal" data-target="#carGalleryModal-@car.CarId">
+                                Виж Снимки
+                            </a>
+                            <div class="d-flex gap-2">
+                                <a asp-action="Edit" asp-route-id="@car.CarId" class="btn btn-secondary d-flex align-items-center">
+                                    Редактирай
+                                    </a>
+
+                                <form asp-action="Delete" asp-route-id="@car.CarId" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да изтриете тази кола?');">
+                                    <button type="submit" class="btn btn-danger d-flex align-items-center">
+                                        Изтрий
+                                        </button>
+                                </form>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for Car Gallery -->
+            <div class="modal fade" id="carGalleryModal-@car.CarId" tabindex="-1" role="dialog" aria-labelledby="carGalleryModalLabel-@car.CarId" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="carGalleryModalLabel-@car.CarId">@car.Brand.Name @car.Model.Name</h5>
+                        </div>
+                        <div class="modal-body d-flex flex-column gap-2">
+                            <!-- Display photos in the modal -->
+                            @foreach (var photo in car.Photos)
+                            {
+                                <img src="@photo.Url" alt="Car Photo" class="img-fluid" />
+                            }
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Затвори</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <form asp-action="Index" asp-controller="Car" method="post" id="paginationForm">
+            <input type="hidden" name="pageNumber" id="pageNumberInput" value="@(ViewBag.CurrentPage)" />
+            <input type="hidden" name="pageSize" value="@(ViewBag.PageSize)" />
+            <div class="d-flex gap-2 justify-content-center">
+                <div class="pagination d-flex gap-2">
+                    <div class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")" id="paginationPrevious" style="@(ViewBag.CurrentPage == 1 ? "display:none;" : "")">
+                        <a class="page-link border-0" href="javascript:void(0);" onclick="changePage(@(ViewBag.CurrentPage - 1))">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="20" height="20"><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" /></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="pagination d-flex gap-2" id="paginationList">
+                    <!-- Pagination numbers will be generated dynamically here -->
+                </div>
+
+                <div class="pagination d-flex gap-2">
+                    <div class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")" style="@(ViewBag.CurrentPage == ViewBag.TotalPages ? "display:none;" : "")">
+                        <a class="page-link border-0" href="javascript:void(0);" onclick="changePage(@(ViewBag.CurrentPage + 1))">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="20" height="20"><path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" /></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section scripts
+{
+    <script>
+        function changePage(pageNumber) {
+            document.getElementById("pageNumberInput").value = pageNumber;
+            document.getElementById("paginationForm").submit();
+        }
+    </script>
+
+    <script>
+        function generatePaginationNumbers(currentPage, totalPages) {
+            var paginationList = document.getElementById("paginationList");
+
+            // Check if paginationList exists before proceeding
+            if (!paginationList) {
+                console.error("paginationList element not found.");
+                return;
+            }
+
+            paginationList.innerHTML = ""; // Clear existing pagination items
+            var startPage = Math.max(1, currentPage - 1);
+            var endPage = Math.min(totalPages, startPage + 2);
+
+            // If on the last page, adjust startPage and endPage accordingly
+            if (endPage === totalPages) {
+                startPage = Math.max(1, endPage - 2); // Ensure to show 3 pages
+            }
+
+            for (var i = startPage; i <= endPage; i++) {
+                var listItem = document.createElement("li");
+                listItem.className = "page-item " + (i === currentPage ? "active" : "");
+                var link = document.createElement("a");
+                link.className = "page-link btn rounded-circle";
+                link.href = "javascript:void(0);";
+                link.textContent = i;
+                link.setAttribute("onclick", "changePage(" + i + ")");
+                if (i === currentPage) {
+                    link.style.backgroundColor = "#08c2df";
+                    link.style.border = "none";
+                }
+                listItem.appendChild(link);
+                paginationList.appendChild(listItem);
+            }
+        }
+
+        // Call the function initially only if currentPage and totalPages are defined
+        if (@(ViewBag.CurrentPage) && @(ViewBag.TotalPages)) {
+            generatePaginationNumbers(@(ViewBag.CurrentPage), @(ViewBag.TotalPages));
+        } else {
+            console.error("ViewBag.CurrentPage or ViewBag.TotalPages is null or undefined.");
+        }
+    </script>
+}
