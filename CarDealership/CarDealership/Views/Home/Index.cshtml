@@ -1,8 +1,190 @@
-﻿@{
+﻿@using CarDealership.Data.Enums
+@model CarDealership.ViewModel.SearchViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.css" integrity="sha512-SZgE3m1he0aEF3tIxxnz/3mXu/u/wlMNxQSnE0Cni9j/O8Gs+TjM9tm1NX34nRQ7GiLwUEzwuE3Wv2FLz2667w==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-gGkZY2ZV9+u9eVLd2xKkZW6Ak3Zc5PVVzUYE9djl1ViiJ8wOA6kA4tCSKJAAqnkmP7TkdwwvK9TGRMzjp6Bu7w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</head>
+
+<div class="row d-flex align-content-center justify-content-center vw-100" style="height:80vh;background-image:url('/Images/BackgroundIndex.jpg'); background-size: cover; background-position: center;  border-radius: 0 0 20% 20%;">
+
+
+    <div class="d-flex flex-column align-items-center mb-4">
+        <h2 class="fs-1 fw-bolder text-white">Търси по-малко. Живей повече.</h2>
+        <h5 class="text-white">Намери желаната кола с лекота. </h5>
+    </div>
+
+    <form method="post" asp-action="Search" asp-controller="Car" id="searchForm" class="form-inline d-flex justify-content-between align-items-center py-3 w-75 rounded bg-white">
+        <div class="form-group d-flex justify-content-center">
+            <select asp-for="Condition" asp-items="Html.GetEnumSelectList<Condition>()" class="form-select mr-2">
+                <option value="">Избери Състояние</option>
+            </select>
+        </div>
+
+        <div class="form-group d-flex justify-content-center">
+            <select asp-for="BrandId" asp-items="@(new SelectList(ViewBag.Brands ?? new List<SelectListItem>(), "BrandId", "Name"))" class="form-select mr-2" id="brandDropdown">
+                <option value="">Избери Марка</option>
+            </select>
+        </div>
+
+        <div class="form-group d-flex justify-content-center">
+
+            <select asp-for="ModelId" class="form-select mr-2" id="modelDropdown">
+                <option value="">Избери Модел</option>
+            </select>
+        </div>
+
+        <div class="form-group d-flex flex-column justify-content-center col-2">
+            <input asp-for="PriceRange" id="priceRangeSlider" class="multi-range" type="text" data-slider-min="0" data-slider-max="100000" data-slider-step="500" data-slider-value="[0,100000]" />
+
+            <div class="d-flex justify-content-between">
+                <span id="minPriceLabel" class="slider-label"></span>
+                <span id="maxPriceLabel" class="slider-label"></span>
+            </div>
+        </div>
+
+        <input asp-for="MinPrice" id="MinPrice" type="hidden" />
+        <input asp-for="MaxPrice" id="MaxPrice" type="hidden" />
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary px-4" id="searchButton" style="background-color:#08c2df; border:none; transition: background-color 0.3s;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="20" height="20" style="fill: white;">
+                    <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+                </svg>
+                Търси
+            </button>
+        </div>
+    </form>
 </div>
+<div class="row" style="margin-top:-50px">
+    <form method="post" asp-action="Search" asp-controller="Car" id="searchFormCarType" class="form-inline d-flex justify-content-center align-content-between">
+        <div class="form-group">
+            <input asp-for="CarType" id="carTypeInput" type="hidden" />
+            <div class="btn-group" role="group" aria-label="Car Type Buttons">
+                <button type="button" class="btn btn-primary btn-lg rounded d-flex flex-column" onclick="setCarType('Sedan')" style="width: 150px; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: #08c2df; border: none;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/55/55283.png" alt="Sedan" style="max-width: 30px; filter: brightness(0) invert(1);" /> Седан
+                </button>
+                <button type="button" class="btn btn-primary btn-lg rounded d-flex flex-column" onclick="setCarType('Hatchback')" style="width: 150px; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: #08c2df; border: none;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/55/55308.png" alt="Hatchback" style="max-width: 30px; filter: brightness(0) invert(1);" /> Хечбек
+                </button>
+                <button type="button" class="btn btn-primary btn-lg rounded d-flex flex-column" onclick="setCarType('Micro')" style="width: 150px; display: flex; align-items: center; justify-content: center; margin-right: 10px; background-color: #08c2df; border: none;">
+                    <img src="https://cdn-icons-png.flaticon.com/128/9983/9983078.png" alt="Micro" style="max-width: 30px; filter: brightness(0) invert(1); transform: scaleX(-1);" /> Микро
+                </button>
+                <button type="button" class="btn btn-primary btn-lg rounded d-flex flex-column" onclick="setCarType('SUV')" style="width: 150px; display: flex; align-items: center; justify-content: center; background-color: #08c2df; border: none;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/55/55280.png" alt="SUV" style="max-width: 30px; filter: brightness(0) invert(1);" /> SUV
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        // Function to fetch and populate models based on the selected brand
+        function fetchAndPopulateModels(brandId) {
+            // Clear existing options in the model dropdown
+            $('#modelDropdown').html('<option value=""disabled selected>Избери Модел</option>');
+
+            if (brandId) {
+                // Use Url.Action to generate the correct URL
+                var url = '@Url.Action("GetModels", "Car")/' + brandId;
+
+                // Fetch models based on the selected brand
+                $.getJSON(url, function (models) {
+                    // Populate the model dropdown with fetched models
+                    $.each(models, function (index, model) {
+                        $('#modelDropdown').append('<option value="' + model.modelId + '">' + model.name + '</option>');
+                    });
+
+                    // Set the selected value based on ViewBag.SelectedModelName if not empty
+                    var selectedModelName = '@ViewBag.SelectedModelName';
+                    console.log(selectedModelName);
+                    if (selectedModelName) {
+                        // Find the option with the matching text and select it
+                        $('#modelDropdown option').filter(function () {
+                            return $(this).text() === selectedModelName;
+                        }).prop('selected', true);
+                    }
+                });
+            }
+        }
+
+        // Execute the script on page load
+        $(document).ready(function () {
+            var initialBrandId = $('#brandDropdown').val();
+            fetchAndPopulateModels(initialBrandId);
+        });
+
+        // Handle change event on the brand dropdown
+        $(document).on('change', '#brandDropdown', function () {
+            var brandId = $(this).val();
+
+            // Call the function to fetch and populate models
+            fetchAndPopulateModels(brandId);
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js" integrity="sha512-f0VlzJbcEB6KiW8ZVtL+5HWPDyW1+nJEjguZ5IVnSQkvZbwBt2RfCBY0CBO1PsMAqxxrG4Di6TfsCPP3ZRwKpA==" crossorigin="anonymous"></script>
+
+    <script>
+        // Initialize Bootstrap Slider for the price range
+        $('#priceRangeSlider').slider({
+            tooltip: 'hide'
+        }).on('slide', function (ev) {
+            var minPrice = ev.value[0];
+            var maxPrice = ev.value[1];
+
+            $('#minPriceLabel').text(minPrice + " лв.");
+            $('#maxPriceLabel').text(maxPrice + " лв.");
+
+            // Set the values to hidden fields or update your form elements
+            $('#MinPrice').val(minPrice);
+            $('#MaxPrice').val(maxPrice);
+        });
+
+        // Function to set initial label values
+        function setInitialLabels() {
+            var minPrice = $('#priceRangeSlider').data('slider-min');
+            var maxPrice = $('#priceRangeSlider').data('slider-max');
+
+            $('#minPriceLabel').text(minPrice + " лв.");
+            $('#maxPriceLabel').text(maxPrice + " лв.");
+
+            // Set the initial values to hidden fields or update your form elements
+            $('#MinPrice').val(minPrice + " лв.");
+            $('#MaxPrice').val(maxPrice + " лв.");
+        }
+
+        // Execute the script on page load
+        $(document).ready(function () {
+            setInitialLabels();
+        });
+
+        // Handle slide event on the priceRangeSlider
+        $('#priceRangeSlider').on('slide', function (ev) {
+            var minPrice = ev.value[0];
+            var maxPrice = ev.value[1];
+
+            $('#minPriceLabel').text(minPrice + " лв.");
+            $('#maxPriceLabel').text(maxPrice + " лв.");
+
+            // Set the values to hidden fields or update your form elements
+            $('#MinPrice').val(minPrice);
+            $('#MaxPrice').val(maxPrice);
+        });
+
+        $('#searchForm').submit(function () {
+            console.log('Submitting form with MinPrice:', $('#MinPrice').val(), 'and MaxPrice:', $('#MaxPrice').val());
+        });
+    </script>
+    <script>
+        function setCarType(carType) {
+            $('#carTypeInput').val(carType);
+            $('#searchFormCarType').submit();
+        }
+    </script>
+}

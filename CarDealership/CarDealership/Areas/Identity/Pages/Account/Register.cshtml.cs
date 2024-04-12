@@ -31,7 +31,6 @@ namespace CarDealership.Areas.Identity.Pages.Account
         public InputModel Input { get; set; }
 
         public string ReturnUrl { get; set; }
->
         public class InputModel
         {
             [Required]
