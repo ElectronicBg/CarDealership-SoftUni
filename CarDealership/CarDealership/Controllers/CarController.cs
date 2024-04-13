@@ -1,7 +1,9 @@
 ﻿using CarDealership.Data;
 using CarDealership.Models;
+using CarDealership.Services.Car;
 using CarDealership.ViewModel;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +12,11 @@ namespace CarDealership.Controllers
     public class CarController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public CarController(ApplicationDbContext context)
+        private readonly ICarService _carService;
+        public CarController(ApplicationDbContext context, ICarService carService)
         {
             _context = context;
+            _carService = carService;
         }
 
         [Authorize(Roles = "Admin")]
@@ -117,128 +120,14 @@ namespace CarDealership.Controllers
         //Search Cars
         [HttpPost]
         [Route("Car/Search")]
-        public IActionResult Search(SearchViewModel search, int? pageNumber)
+        public async Task<IActionResult> Search(SearchViewModel search, int? pageNumber)
         {
+
             ViewBag.Brands = _context.Brands.ToList();
             ViewBag.CarColors = _context.CarColors.ToList();
 
-            // Query to get cars based on selected filters
-            var query = _context.Cars
-                        .Include(c => c.Brand)
-                        .Include(c => c.CarColor)
-                        .Include(c => c.Model)
-                        .Include(c => c.Photos).ToList()
-                        .AsQueryable();
-
-
-            // Filter by brand
-            if (search.BrandId.HasValue)
-            {
-                query = query.Where(c => c.BrandId == search.BrandId);
-            }
-
-            int? selectedModelId = null;  // Variable to store the selected model ID
-            string selectedModelName = null;  // Variable to store the selected model name
-
-            // Filter by model
-            if (search.ModelId.HasValue)
-            {
-                query = query.Where(c => c.ModelId == search.ModelId);
-                selectedModelId = search.ModelId;  // Capture the selected model ID
-
-                // Query the database to get the model name based on the selected model ID
-                var selectedModel = _context.Models.FirstOrDefault(m => m.ModelId == search.ModelId);
-                if (selectedModel != null)
-                {
-                    selectedModelName = selectedModel.Name;
-                }
-            }
-
-            // Filter by engine type
-            if (search.EngineType.HasValue)
-            {
-                query = query.Where(c => c.EngineType == search.EngineType);
-            }
-
-            // Filter by transmission type
-            if (search.TransmissionType.HasValue)
-            {
-                query = query.Where(c => c.TransmissionType == search.TransmissionType);
-            }
-
-            // Filter by color
-            if (search.CarColorId.HasValue)
-            {
-                query = query.Where(c => c.CarColorId == search.CarColorId);
-            }
-
-            // Filter by region
-            if (search.Region.HasValue)
-            {
-                query = query.Where(c => c.Region == search.Region);
-            }
-
-            // Filter by year range
-            if (search.MinYear.HasValue)
-            {
-                query = query.Where(c => c.Year >= search.MinYear);
-            }
-
-            if (search.MaxYear.HasValue)
-            {
-                query = query.Where(c => c.Year <= search.MaxYear);
-            }
-
-            // Filter by car type
-            if (search.CarType.HasValue)
-            {
-                query = query.Where(c => c.CarType == search.CarType);
-            }
-
-            // Filter by condition
-            if (search.Condition.HasValue)
-            {
-                query = query.Where(c => c.Condition == search.Condition);
-            }
-
-            // Filter by price range
-            if (search.MinPrice.HasValue)
-            {
-                query = query.Where(c => c.Price >= search.MinPrice);
-            }
-
-            if (search.MaxPrice.HasValue)
-            {
-                query = query.Where(c => c.Price <= search.MaxPrice);
-            }
-
-            // Apply sorting based on the orderBy parameter
-            switch (search.OrderBy)
-            {
-                case "PriceAsc":
-                    query = query.OrderBy(c => c.Price);
-                    break;
-
-                case "PriceDesc":
-                    query = query.OrderByDescending(c => c.Price);
-                    break;
-
-                case "MileageAsc":
-                    query = query.OrderBy(c => c.Mileage);
-                    break;
-
-                case "MileageDesc":
-                    query = query.OrderByDescending(c => c.Mileage);
-                    break;
-
-                default:
-                    // Default sorting (you can choose a default based on your requirements)
-                    query = query.OrderBy(c => c.Price);
-                    break;
-            }
-
-            // Materialize the query into a list before pagination
-            var results = query.ToList();
+            var searchResult = await _carService.SearchAsync(search);
+            var results=searchResult.Cars.ToList();
 
             // Pagination
             if (search.PageSize == 0)
@@ -248,8 +137,7 @@ namespace CarDealership.Controllers
             else
             {
                 search.PageSize = search.PageSize; //?? 6; // Default page size is 3
-            } 
-            
+            }
             pageNumber = pageNumber ?? 1;
 
             var paginatedResults = results
@@ -263,7 +151,7 @@ namespace CarDealership.Controllers
             ViewBag.CurrentPage = pageNumber.Value;
             ViewBag.TotalPages = (int)Math.Ceiling((double)results.Count() / search.PageSize);
 
-            ViewBag.SelectedModelName = selectedModelName;
+            ViewBag.SelectedModelName = searchResult.ModelName;
 
             return View(search);
         }

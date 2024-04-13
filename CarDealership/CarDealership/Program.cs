@@ -1,5 +1,6 @@
 using CarDealership.Data;
 using CarDealership.Models;
+using CarDealership.Services.Car;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI().AddDefaultTokenProviders();
+
+builder.Services.AddScoped<ICarService,CarService>();
 
 var app = builder.Build();
 
@@ -37,9 +40,34 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "getmodels",
+        pattern: "Car/GetModels/{brandId}",
+        defaults: new { controller = "Car", action = "GetModels" });
+
+    endpoints.MapControllerRoute(
+      name: "Search",
+      pattern: "Car/Search",
+      defaults: new { controller = "Car", action = "Search" }
+  );
+    endpoints.MapControllerRoute(
+        name: "Details",
+        pattern: "Car/Details/{id}",
+        defaults: new { controller = "Car", action = "Details" });
+
+    endpoints.MapControllerRoute(
+    name: "DeletePhoto",
+    pattern: "Photo/Delete/{photoId}",
+    defaults: new { controller = "Photo", action = "Delete" }
+);
+
+    endpoints.MapControllerRoute(
+     name: "default",
+     pattern: "{controller=Home}/{action=Index}/{id?}");
+});
+
 app.MapRazorPages();
 
 //Seed Roles
