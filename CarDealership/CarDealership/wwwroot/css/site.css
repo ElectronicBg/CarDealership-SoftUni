@@ -16,3 +16,20 @@ html {
 body {
   margin-bottom: 60px;
 }
+.slider-handle {
+    background-image: linear-gradient(to bottom, #08c2df, #08c2df) !important;
+}
+.btn-primary {
+    border: none;
+    background-color: #08c2df !important;
+}
+
+.btn-secondary {
+    border: none;
+    background-color: #4e8397 !important;
+}
+
+.btn-danger {
+    border: none;
+    background-color: #E1341E !important;
+}
