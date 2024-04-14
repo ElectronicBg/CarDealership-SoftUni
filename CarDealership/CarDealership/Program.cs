@@ -1,5 +1,6 @@
 using CarDealership.Data;
 using CarDealership.Models;
+using CarDealership.Services.Brand;
 using CarDealership.Services.Car;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddDefaultUI().AddDefaultTokenProviders();
 
 builder.Services.AddScoped<ICarService,CarService>();
+builder.Services.AddScoped<IBrandService, BrandService>();
 
 var app = builder.Build();
 

@@ -1,56 +1,54 @@
 ﻿using CarDealership.Data;
+using CarDealership.Services.Brand;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 [Authorize(Roles = "Admin")]
 public class BrandController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly IBrandService _brandService;
 
-    public BrandController(ApplicationDbContext context)
+    public BrandController(ApplicationDbContext context, IBrandService brandService)
     {
         _context = context;
+        _brandService = brandService;
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var brands = _context.Brands.ToList();
+        var brands = await _brandService.GetAllBrandsAsync();
         return View(brands);
     }
 
-    // GET: Brand/Create
     [HttpGet]
     public IActionResult Create()
     {
         return View();
     }
 
-    // POST: Brand/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(Brand brand)
+    public async Task<IActionResult> Create(Brand brand)
     {
         if (ModelState.IsValid)
         {
-            _context.Brands.Add(brand);
-            _context.SaveChanges();
+            await _brandService.CreateBrandAsync(brand);
             return RedirectToAction(nameof(Index));
         }
         return View(brand);
     }
 
-    // GET: Brand/Edit/5
     [HttpGet]
-    public IActionResult Edit(int? id)
+    public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        var brand = _context.Brands.Find(id);
+        var brand = await _brandService.GetBrandByIdAsync(id.Value);
         if (brand == null)
         {
             return NotFound();
@@ -59,10 +57,9 @@ public class BrandController : Controller
         return View(brand);
     }
 
-    // POST: Brand/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, Brand brand)
+    public async Task<IActionResult> Edit(int id, Brand brand)
     {
         if (id != brand.BrandId)
         {
@@ -71,29 +68,21 @@ public class BrandController : Controller
 
         if (ModelState.IsValid)
         {
-            try
+            var isSuccess = await _brandService.UpdateBrandAsync(id, brand);
+            if (isSuccess)
             {
-                _context.Entry(brand).State = EntityState.Modified;
-                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!BrandExists(brand.BrandId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
-            return RedirectToAction(nameof(Index));
         }
         return View(brand);
     }
 
-    private bool BrandExists(int id)
+    private async Task<bool> BrandExists(int id)
     {
-        return _context.Brands.Any(e => e.BrandId == id);
+        return await _brandService.BrandExistsAsync(id);
     }
 }
