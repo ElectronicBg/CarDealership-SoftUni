@@ -57,8 +57,6 @@ namespace CarDealership.Data
         [EnumDataType(typeof(Condition))]
         [Required(ErrorMessage = "Моля въведете Състояние.")]
         public Condition Condition { get; set; }
-
-        //[Required(ErrorMessage = "Моля въведете линк към Снимка.")]
         public List<Photo> Photos { get; set; }
 
         [Range(0, double.MaxValue, ErrorMessage = "Цената трябва да бъде неотрицателно число.")]

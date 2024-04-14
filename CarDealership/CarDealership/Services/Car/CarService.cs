@@ -1,7 +1,7 @@
 ﻿using CarDealership.Data;
 using CarDealership.Helpers;
 using CarDealership.ViewModel;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarDealership.Services.Car
@@ -15,6 +15,18 @@ namespace CarDealership.Services.Car
             _context = context;
         }
 
+        public Task<IQueryable<Data.Car>> IndexAsync()
+        {
+            var cars = _context.Cars
+                .Include(c => c.Brand)
+                .Include(c => c.Model)
+                .Include(c => c.CarColor)
+                .Include(c => c.Photos)
+                .AsQueryable();
+
+            return Task.FromResult(cars);
+        }
+       
         public async Task<CarsWithSelectedModelName> SearchAsync(SearchViewModel search)
         {
             // Query to get cars based on selected filters
@@ -138,6 +150,52 @@ namespace CarDealership.Services.Car
                 Cars = await query.ToListAsync(),
                 ModelName = selectedModelName
             };
+        }
+        public async Task<Data.Car> GetCarDetailsAsync(int id)
+        {
+            var car = await _context.Cars
+                .Include(c => c.Brand)
+                .Include(c => c.Model)
+                .Include(c => c.CarColor)
+                .Include(c => c.Photos)
+                .FirstOrDefaultAsync(c => c.CarId == id);
+
+            return car;
+        }
+        public async Task<bool> UpdateCarAsync(int id, Data.Car editedCar)
+        {
+            if (id != editedCar.CarId)
+            {
+                return false;
+            }
+
+            var existingCar = await _context.Cars
+                .FirstOrDefaultAsync(c => c.CarId == id);
+
+            if (existingCar == null)
+            {
+                return false;
+            }
+
+            // Update the existing car entity
+            _context.Entry(existingCar).CurrentValues.SetValues(editedCar);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+        public async Task<bool> DeleteCarAsync(int id)
+        {
+            var car = await _context.Cars.FindAsync(id);
+
+            if (car == null)
+            {
+                return false;
+            }
+
+            _context.Cars.Remove(car);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

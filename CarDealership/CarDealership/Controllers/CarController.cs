@@ -20,14 +20,9 @@ namespace CarDealership.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Index(int? pageSize, int? pageNumber)
-        {
-            var cars = _context.Cars
-                .Include(c => c.Brand)
-                .Include(c=>c.Model)
-                .Include(c => c.CarColor)
-                .Include(c => c.Photos)
-                .AsQueryable(); 
+        public async Task<IActionResult> Index(int? pageSize, int? pageNumber)
+        { 
+            var cars= await _carService.IndexAsync();
 
             // Pagination
             pageSize = pageSize ?? 6; // Default page size is 6
@@ -91,9 +86,8 @@ namespace CarDealership.Controllers
             ViewBag.CarColors = _context.CarColors.ToList();
 
             // Return a JSON result with success status (false in this case)
-            return Json(new { success = false});
+            return Json(new { success = false });
         }
-
 
         [HttpGet]
         public IActionResult GetModels(int brandId)
@@ -136,7 +130,7 @@ namespace CarDealership.Controllers
             }
             else
             {
-                search.PageSize = search.PageSize; //?? 6; // Default page size is 3
+                search.PageSize = search.PageSize; 
             }
             pageNumber = pageNumber ?? 1;
 
@@ -159,15 +153,9 @@ namespace CarDealership.Controllers
         //Car Details
         [HttpGet]
         [Route("Car/Details/{id}")]
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            // Retrieve the car details based on the 'id' parameter
-            var car = _context.Cars
-                .Include(c => c.Brand)
-                .Include(c => c.Model)
-                .Include(c => c.CarColor)
-                .Include(c => c.Photos)
-                .FirstOrDefault(c => c.CarId == id);
+            var car = await _carService.GetCarDetailsAsync(id);
 
             if (car == null)
             {
@@ -178,7 +166,6 @@ namespace CarDealership.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        // Update Car
         public IActionResult Edit(int id)
         {
             var car = _context.Cars
@@ -205,32 +192,20 @@ namespace CarDealership.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(int id, Car editedCar)
+        public async Task<IActionResult> Edit(int id, Car editedCar)
         {
-            if (id != editedCar.CarId)
-            {
-                return NotFound();
-            }
-            ModelState.Remove("Photos");
             if (ModelState.IsValid)
             {
-                // Retrieve the existing car from the database
-                var existingCar = _context.Cars
-                    .Include(c => c.Brand)
-                    .Include(c => c.Model)
-                    .Include(c => c.CarColor)
-                    .Include(c => c.Photos)
-                    .FirstOrDefault(c => c.CarId == id);
+                var isSuccess = await _carService.UpdateCarAsync(id, editedCar);
 
-                if (existingCar == null)
+                if (isSuccess)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
                 {
                     return NotFound();
                 }
-
-                _context.Entry(existingCar).CurrentValues.SetValues(editedCar);
-                _context.SaveChanges();
-
-                return RedirectToAction("Index");
             }
 
             ViewBag.Brands = _context.Brands.ToList();
@@ -241,29 +216,23 @@ namespace CarDealership.Controllers
                 .Where(m => m.BrandId == editedCar.BrandId)
                 .ToList();
 
-            var car = _context.Cars
-                .Include(c => c.Brand)
-                .Include(c => c.Model)
-                .Include(c => c.CarColor)
-                .Include(c => c.Photos)
-                .FirstOrDefault(c => c.CarId == id);
-
-            return View("Edit",car);
+            return View("Edit", editedCar);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var car = _context.Cars.Find(id);
+            var isSuccess = await _carService.DeleteCarAsync(id);
 
-            if (car == null)
+            if (isSuccess)
+            {
+                return RedirectToAction("Index");
+            }
+            else
             {
                 return NotFound();
             }
-
-            _context.Cars.Remove(car);
-            _context.SaveChanges();
-            return RedirectToAction("Index");
         }
     }
 }
