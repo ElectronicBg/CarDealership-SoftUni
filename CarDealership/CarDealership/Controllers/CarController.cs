@@ -1,4 +1,5 @@
 ﻿using CarDealership.Data;
+using CarDealership.Models;
 using CarDealership.Services.Car;
 using CarDealership.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -50,11 +51,11 @@ namespace CarDealership.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Car car, List<string> photos)
+        public async Task<IActionResult> Create(CreateCarViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                var isSuccess = await _carService.CreateCarAsync(car, photos);
+                var isSuccess = await _carService.CreateCarAsync(viewModel);
 
                 if (isSuccess)
                 {

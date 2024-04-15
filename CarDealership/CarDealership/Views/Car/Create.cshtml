@@ -1,5 +1,5 @@
 ﻿@using CarDealership.Data.Enums
-@model CarDealership.Data.Car
+@model CreateCarViewModel
 @{
     ViewData["Title"] = "Create";
 }
@@ -10,83 +10,83 @@
         <div class="col-6">
             <form method="post" asp-action="Create" asp-controller="Car" id="carForm">
                 <div>
-                    <label asp-for="Brand">Марка</label>
-                    <select asp-for="BrandId" asp-items="@(new SelectList(ViewBag.Brands, "BrandId", "Name"))" class="form-control" id="brandDropdown">
+                    <label asp-for="@Model.Car.Brand">Марка</label>
+                    <select asp-for="@Model.Car.BrandId" asp-items="@(new SelectList(ViewBag.Brands, "BrandId", "Name"))" class="form-control" id="brandDropdown">
                         <option value="" disabled selected>Избери Марка</option>
                     </select>
-                    <span asp-validation-for="BrandId" class="text-danger"></span>
+                    <span asp-validation-for="@Model.Car.BrandId" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="ModelId">Модел</label>
-                    <select asp-for="ModelId" class="form-control" id="modelDropdown">
+                    <label asp-for="@Model.Car.ModelId">Модел</label>
+                    <select asp-for="@Model.Car.ModelId" class="form-control" id="modelDropdown">
                         <option value="" disabled selected>Избери Модел</option>
                     </select>
-                    <span asp-validation-for="ModelId" class="text-danger"></span>
+                    <span asp-validation-for="@Model.Car.ModelId" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="EngineType">Тип на Двигателя</label>
-                    <select asp-for="EngineType" asp-items="Html.GetEnumSelectList<EngineType>()" class="form-control">
+                    <label asp-for="@Model.Car.EngineType">Тип на Двигателя</label>
+                    <select asp-for="@Model.Car.EngineType" asp-items="Html.GetEnumSelectList<EngineType>()" class="form-control">
                         <option value="" disabled selected>Избери тип на Двигателя</option>
                     </select>
-                    <span asp-validation-for="EngineType" class="text-danger"></span>
+                    <span asp-validation-for="@Model.Car.EngineType" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="TransmissionType">Тип на Трансмисията</label>
-                    <select asp-for="TransmissionType" asp-items="Html.GetEnumSelectList<TransmissionType>()" class="form-control">
+                    <label asp-for="@Model.Car.TransmissionType">Тип на Трансмисията</label>
+                    <select asp-for="@Model.Car.TransmissionType" asp-items="Html.GetEnumSelectList<TransmissionType>()" class="form-control">
                         <option value="" disabled selected>Избери тип на Трансмисията</option>
                     </select>
-                    <span asp-validation-for="TransmissionType" class="text-danger"></span>
+                    <span asp-validation-for="@Model.Car.TransmissionType" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="CarColorId">Цвят</label>
-                    <select asp-for="CarColorId" asp-items="@(new SelectList(ViewBag.CarColors, "CarColorId", "Name"))" class="form-control">
+                    <label asp-for="@Model.Car.CarColorId">Цвят</label>
+                    <select asp-for="@Model.Car.CarColorId" asp-items="@(new SelectList(ViewBag.CarColors, "CarColorId", "Name"))" class="form-control">
                         <option value="" disabled selected>Избери Цвят на колата</option>
                     </select>
-                    <span asp-validation-for="CarColorId" class="text-danger"></span>
+                    <span asp-validation-for="@Model.Car.CarColorId" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Region">Област</label>
-                    <select asp-for="Region" asp-items="Html.GetEnumSelectList<CarDealership.Data.Enums.Region>()" class="form-control">
+                    <label asp-for="@Model.Car.Region">Област</label>
+                    <select asp-for="@Model.Car.Region" asp-items="Html.GetEnumSelectList<CarDealership.Data.Enums.Region>()" class="form-control">
                         <option value="" disabled selected>Избери Област</option>
                     </select>
-                    <span asp-validation-for="Region" class="text-danger"></span>
+                    <span asp-validation-for="@Model.Car.Region" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Year">Година на Производство</label>
-                    <input asp-for="Year" class="form-control" />
-                    <span asp-validation-for="Year" class="text-danger"></span>
+                    <label asp-for="@Model.Car.Year">Година на Производство</label>
+                    <input asp-for="@Model.Car.Year" class="form-control" />
+                    <span asp-validation-for="@Model.Car.Year" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Mileage">Пробег</label>
-                    <input asp-for="Mileage" class="form-control" type="number"/>
-                    <span asp-validation-for="Mileage" class="text-danger"></span>
+                    <label asp-for="@Model.Car.Mileage">Пробег</label>
+                    <input asp-for="@Model.Car.Mileage" class="form-control" type="number" />
+                    <span asp-validation-for="@Model.Car.Mileage" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Power">Мощност на двигателя</label>
-                    <input asp-for="Power" class="form-control" type="number" />
-                    <span asp-validation-for="Power" class="text-danger"></span>
+                    <label asp-for="@Model.Car.Power">Мощност на двигателя</label>
+                    <input asp-for="@Model.Car.Power" class="form-control" type="number" />
+                    <span asp-validation-for="@Model.Car.Power" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="CarType">Тип на Купето</label>
-                    <select asp-for="CarType" asp-items="Html.GetEnumSelectList<CarType>()" class="form-control">
+                    <label asp-for="@Model.Car.CarType">Тип на Купето</label>
+                    <select asp-for="@Model.Car.CarType" asp-items="Html.GetEnumSelectList<CarType>()" class="form-control">
                         <option value="" disabled selected>Избери тип на Купето</option>
                     </select>
-                    <span asp-validation-for="CarType" class="text-danger"></span>
+                    <span asp-validation-for="@Model.Car.CarType" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Condition">Състояние</label>
-                    <select asp-for="Condition" asp-items="Html.GetEnumSelectList<Condition>()" class="form-control">
+                    <label asp-for="@Model.Car.Condition">Състояние</label>
+                    <select asp-for="@Model.Car.Condition" asp-items="Html.GetEnumSelectList<Condition>()" class="form-control">
                         <option value="" disabled selected>Избери Състояние</option>
                     </select>
-                    <span asp-validation-for="Condition" class="text-danger"></span>
+                    <span asp-validation-for="@Model.Car.Condition" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Price">Цена</label>
-                    <input asp-for="Price" class="form-control" type="number" />
-                    <span asp-validation-for="Price" class="text-danger"></span>
+                    <label asp-for="@Model.Car.Price">Цена</label>
+                    <input asp-for="@Model.Car.Price" class="form-control" type="number" />
+                    <span asp-validation-for="@Model.Car.Price" class="text-danger"></span>
                 </div>
                 <button type="submit" class="btn btn-primary mt-2">Създай</button>
             </form>
@@ -150,50 +150,58 @@
                 }
             });
 
-            // Event handler for form submission
-            $("#carForm").submit(function (event) {
-                // Prevent the default form submission
-                event.preventDefault();
+            $(document).ready(function () {
+                // Event handler for form submission
+                $("#carForm").submit(function (event) {
+                    // Prevent the default form submission
+                    event.preventDefault();
 
-                var carData = {
-                    BrandId: $("#brandDropdown").val(),
-                    ModelId: $("#modelDropdown").val(),
-                    EngineType: $("#EngineType").val(),
-                    TransmissionType: $("#TransmissionType").val(),
-                    CarColorId: $("#CarColorId").val(),
-                    Region: $("#Region").val(),
-                    Year: $("#Year").val(),
-                    Mileage: $("#Mileage").val(),
-                    Power: $("#Power").val(),
-                    CarType: $("#CarType").val(),
-                    Condition: $("#Condition").val(),
-                    Price: $("#Price").val(),
-                    Photos: photoUrls
-                };
+                    var carData = {
+                        BrandId: $("#brandDropdown").val(),
+                        ModelId: $("#modelDropdown").val(),
+                        EngineType: $("#Car_EngineType").val(),
+                        TransmissionType: $("#Car_TransmissionType").val(),
+                        CarColorId: $("#Car_CarColorId").val(),
+                        Region: $("#Car_Region").val(),
+                        Year: $("#Car_Year").val(),
+                        Mileage: $("#Car_Mileage").val(),
+                        Power: $("#Car_Power").val(),
+                        CarType: $("#Car_CarType").val(),
+                        Condition: $("#Car_Condition").val(),
+                        Price: $("#Car_Price").val(),
+                        Photos: photoUrls
+                    };
+                    console.log("carData:", carData);
+                    var viewModel = {
+                        Car: carData,
+                        Photos: photoUrls
+                    };
 
-                // Perform the AJAX request
-                $.ajax({
-                    type: "POST",
-                    url: "/Car/Create",
-                    data: { car: carData, photos: photoUrls },
-                    success: function (data) {
-                        if (data.success) {
-                            console.log("Car and photos added successfully");
+                    // Perform the AJAX request
+                    $.ajax({
+                        type: "POST",
+                        url: "/Car/Create",
+                        data: viewModel,
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.success) {
+                                console.log("Car and photos added successfully");
 
-                            // Check if there's a redirect URL
-                            if (data.redirectUrl) {
-                                // Redirect to the specified URL
-                                window.location.href = data.redirectUrl;
+                                // Check if there's a redirect URL
+                                if (data.redirectUrl) {
+                                    // Redirect to the specified URL
+                                    window.location.href = data.redirectUrl;
+                                } else {
+                                    console.warn("No redirection URL provided.");
+                                }
                             } else {
-                                console.warn("No redirection URL provided.");
+                                console.warn("Error adding car and photos:", data.message || "Unknown error");
                             }
-                        } else {
-                            console.warn("Error adding car and photos:", data.message || "Unknown error");
+                        },
+                        error: function () {
+                            console.warn("AJAX request failed");
                         }
-                    },
-                    error: function () {
-                        console.warn("AJAX request failed");
-                    }
+                    });
                 });
             });
         });

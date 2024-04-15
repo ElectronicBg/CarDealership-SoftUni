@@ -1,5 +1,6 @@
 ﻿using CarDealership.Data;
 using CarDealership.Helpers;
+using CarDealership.Models;
 using CarDealership.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,23 +27,23 @@ namespace CarDealership.Services.Car
 
             return Task.FromResult(cars);
         }
-        public async Task<bool> CreateCarAsync(Data.Car car, List<string> photos)
+        public async Task<bool> CreateCarAsync(CreateCarViewModel viewModel)
         {
-            if (car == null)
+            if (viewModel == null || viewModel.Car == null)
             {
                 return false;
             }
 
-            _context.Cars.Add(car);
+            _context.Cars.Add(viewModel.Car);
             await _context.SaveChangesAsync();
 
-            if (photos != null && photos.Any())
+            if (viewModel.Photos != null && viewModel.Photos.Any())
             {
-                foreach (var photoUrl in photos)
+                foreach (var photoUrl in viewModel.Photos)
                 {
                     var photoModel = new Photo
                     {
-                        CarId = car.CarId,
+                        CarId = viewModel.Car.CarId,
                         Url = photoUrl
                     };
 

@@ -2,13 +2,14 @@
 using CarDealership.ViewModel;
 using CarDealership.Data;
 using Microsoft.AspNetCore.Mvc;
+using CarDealership.Models;
 
 namespace CarDealership.Services.Car
 {
     public interface ICarService
     {
         Task<IQueryable<Data.Car>> IndexAsync();
-        Task<bool> CreateCarAsync(Data.Car car, List<string> photos);
+        Task<bool> CreateCarAsync(CreateCarViewModel viewModel);
         Task<IEnumerable<object>> GetModelsByBrandIdAsync(int brandId);
         Task<CarsWithSelectedModelName> SearchAsync(SearchViewModel search);
         Task<Data.Car> GetCarDetailsAsync(int id);
