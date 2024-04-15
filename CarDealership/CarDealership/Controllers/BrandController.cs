@@ -6,12 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 [Authorize(Roles = "Admin")]
 public class BrandController : Controller
 {
-    private readonly ApplicationDbContext _context;
     private readonly IBrandService _brandService;
 
-    public BrandController(ApplicationDbContext context, IBrandService brandService)
+    public BrandController(IBrandService brandService)
     {
-        _context = context;
         _brandService = brandService;
     }
 

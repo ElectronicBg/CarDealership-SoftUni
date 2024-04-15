@@ -1,57 +1,53 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CarDealership.Data; 
-using CarDealership.Models;
+using CarDealership.Data;
 using Microsoft.AspNetCore.Authorization;
+using CarDealership.Services.Color;
 
 [Authorize(Roles = "Admin")]
 public class ColorController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IColorService _carColorService;
 
-    public ColorController(ApplicationDbContext context)
+    public ColorController(IColorService carColorService)
     {
-        _context = context;
+        _carColorService = carColorService;
     }
-    // GET: Color/Index
+
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var colors = _context.CarColors.ToList();
+        var colors = await _carColorService.GetAllCarColorsAsync();
         return View(colors);
     }
 
-    // GET: Color/Create
     [HttpGet]
     public IActionResult Create()
     {
         return View();
     }
 
-    // POST: Color/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(CarColor carColor)
+    public async Task<IActionResult> Create(CarColor carColor)
     {
         if (ModelState.IsValid)
         {
-            _context.CarColors.Add(carColor);
-            _context.SaveChanges();
+            await _carColorService.CreateCarColorAsync(carColor);
             return RedirectToAction(nameof(Index));
         }
+
         return View(carColor);
     }
 
-    // GET: Color/Edit/5
     [HttpGet]
-    public IActionResult Edit(int? id)
+    public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        var carColor = _context.CarColors.Find(id);
+        var carColor = await _carColorService.GetCarColorByIdAsync(id.Value);
 
         if (carColor == null)
         {
@@ -61,10 +57,9 @@ public class ColorController : Controller
         return View(carColor);
     }
 
-    // POST: Color/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, CarColor carColor)
+    public async Task<IActionResult> Edit(int id, CarColor carColor)
     {
         if (id != carColor.CarColorId)
         {
@@ -73,30 +68,22 @@ public class ColorController : Controller
 
         if (ModelState.IsValid)
         {
-            try
+            var isSuccess = await _carColorService.UpdateCarColorAsync(id, carColor);
+            if (isSuccess)
             {
-                _context.Entry(carColor).State = EntityState.Modified;
-                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!ColorExists(carColor.CarColorId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
-            return RedirectToAction(nameof(Index));
         }
 
         return View(carColor);
     }
 
-    private bool ColorExists(int id)
+    private async Task<bool> ColorExists(int id)
     {
-        return _context.CarColors.Any(e => e.CarColorId == id);
+        return await _carColorService.CarColorExistsAsync(id);
     }
 }

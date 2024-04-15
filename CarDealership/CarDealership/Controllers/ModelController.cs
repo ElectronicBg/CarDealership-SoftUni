@@ -2,80 +2,67 @@
 using Microsoft.EntityFrameworkCore;
 using CarDealership.Data;
 using Microsoft.AspNetCore.Authorization;
+using CarDealership.Services.Model;
 
 [Authorize(Roles = "Admin")]
 public class ModelController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IModelService _modelService;
 
-    public ModelController(ApplicationDbContext context)
+    public ModelController(IModelService modelService)
     {
-        _context = context;
+        _modelService = modelService;
     }
 
-    // GET: Model/Index
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var modelsByBrand = _context.Models
-            .Include(m => m.Brand)
-            .OrderBy(m => m.Brand.Name)
-            .ToList()
-            .GroupBy(m => m.Brand.Name); // Group models by brand name
-
+        var modelsByBrand = await _modelService.GetModelsGroupedByBrandAsync();
         return View(modelsByBrand);
     }
 
-    // GET: Model/Create
     [HttpGet]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        ViewBag.Brands = _context.Brands.ToList();
+        ViewBag.Brands = await _modelService.GetAllBrandsAsync();
         return View();
     }
 
-    // POST: Model/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(Model model)
+    public async Task<IActionResult> Create(Model model)
     {
         if (ModelState.IsValid)
         {
-            _context.Models.Add(model);
-            _context.SaveChanges();
+            await _modelService.CreateModelAsync(model);
             return RedirectToAction(nameof(Index));
         }
 
-        ViewBag.Brands = _context.Brands.ToList();
+        ViewBag.Brands = await _modelService.GetAllBrandsAsync();
         return View(model);
     }
 
-    // GET: Model/Edit/5
     [HttpGet]
-    public IActionResult Edit(int? id)
+    public async Task<IActionResult> Edit(int? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        var model = _context.Models
-            .Include(m => m.Brand)
-            .FirstOrDefault(m => m.ModelId == id);
-
+        var model = await _modelService.GetModelByIdAsync(id.Value);
         if (model == null)
         {
             return NotFound();
         }
 
-        ViewBag.Brands = _context.Brands.ToList();
+        ViewBag.Brands = await _modelService.GetAllBrandsAsync();
         return View(model);
     }
 
-    // POST: Model/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, Model model)
+    public async Task<IActionResult> Edit(int id, Model model)
     {
         if (id != model.ModelId)
         {
@@ -84,31 +71,23 @@ public class ModelController : Controller
 
         if (ModelState.IsValid)
         {
-            try
+            var isSuccess = await _modelService.UpdateModelAsync(id, model);
+            if (isSuccess)
             {
-                _context.Entry(model).State = EntityState.Modified;
-                _context.SaveChanges();
+                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!ModelExists(model.ModelId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
-            return RedirectToAction(nameof(Index));
         }
 
-        ViewBag.Brands = _context.Brands.ToList();
+        ViewBag.Brands = await _modelService.GetAllBrandsAsync();
         return View(model);
     }
 
-    private bool ModelExists(int id)
+    private async Task<bool> ModelExists(int id)
     {
-        return _context.Models.Any(e => e.ModelId == id);
+        return await _modelService.ModelExistsAsync(id);
     }
 }
