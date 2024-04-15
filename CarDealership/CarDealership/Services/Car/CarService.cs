@@ -26,7 +26,44 @@ namespace CarDealership.Services.Car
 
             return Task.FromResult(cars);
         }
-       
+        public async Task<bool> CreateCarAsync(Data.Car car, List<string> photos)
+        {
+            if (car == null)
+            {
+                return false;
+            }
+
+            _context.Cars.Add(car);
+            await _context.SaveChangesAsync();
+
+            if (photos != null && photos.Any())
+            {
+                foreach (var photoUrl in photos)
+                {
+                    var photoModel = new Photo
+                    {
+                        CarId = car.CarId,
+                        Url = photoUrl
+                    };
+
+                    _context.Photos.Add(photoModel);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+        public async Task<IEnumerable<object>> GetModelsByBrandIdAsync(int brandId)
+        {
+            var models = await _context.Models
+                .Where(m => m.BrandId == brandId)
+                .Select(m => new { m.ModelId, m.Name })
+                .ToListAsync();
+
+            return models;
+        }
         public async Task<CarsWithSelectedModelName> SearchAsync(SearchViewModel search)
         {
             // Query to get cars based on selected filters

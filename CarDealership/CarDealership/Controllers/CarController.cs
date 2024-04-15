@@ -1,9 +1,7 @@
 ﻿using CarDealership.Data;
-using CarDealership.Models;
 using CarDealership.Services.Car;
 using CarDealership.ViewModel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,60 +41,36 @@ namespace CarDealership.Controllers
 
         // Add Car
         [Authorize(Roles = "Admin")]
+        [HttpGet]
         public IActionResult Create()
         {
             ViewBag.Brands = _context.Brands.ToList();
             ViewBag.CarColors = _context.CarColors.ToList();
-
             return View();
         }
+
         [HttpPost]
-        public IActionResult Create(Car car, List<string> photos)
+        public async Task<IActionResult> Create(Car car, List<string> photos)
         {
             if (ModelState.IsValid)
             {
-                // Save the car to the database
-                _context.Cars.Add(car);
-                _context.SaveChanges();
+                var isSuccess = await _carService.CreateCarAsync(car, photos);
 
-                // Check if photos are provided
-                if (photos != null && photos.Any())
+                if (isSuccess)
                 {
-                    foreach (var photoUrl in photos)
-                    {
-                        var photoModel = new Photo
-                        {
-                            CarId = car.CarId,
-                            Url = photoUrl
-                        };
-
-                        // Save each photo to the database
-                        _context.Photos.Add(photoModel);
-                    }
-
-                    _context.SaveChanges();
+                    return Json(new { success = true, redirectUrl = Url.Action("Index", "Car") });
                 }
-
-                // Return a JSON result with success status and redirection URL
-                return Json(new { success = true, redirectUrl = Url.Action("Index", "Car") });
             }
 
-            // Repopulate dropdowns 
             ViewBag.Brands = _context.Brands.ToList();
             ViewBag.CarColors = _context.CarColors.ToList();
-
-            // Return a JSON result with success status (false in this case)
             return Json(new { success = false });
         }
 
         [HttpGet]
-        public IActionResult GetModels(int brandId)
+        public async Task<IActionResult> GetModels(int brandId)
         {
-            var models = _context.Models
-                .Where(m => m.BrandId == brandId)
-                .Select(m => new { m.ModelId, m.Name })
-                .ToList();
-
+            var models = await _carService.GetModelsByBrandIdAsync(brandId);
             return Json(models);
         }
 
