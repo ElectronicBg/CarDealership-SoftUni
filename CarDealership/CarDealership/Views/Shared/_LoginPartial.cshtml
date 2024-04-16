@@ -1,13 +1,24 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
+        var userId = User.Claims.FirstOrDefault(a => a.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId == null)
+        {
+            throw new ArgumentException("Invalid user.");
+        }
+
+        var user = await UserManager.FindByIdAsync(userId);
+
+        <li class="nav-item me-3 pe-3 border-end">
+            <a class="nav-link text-dark" title="Manage">Здравейте, @user.Name!</a>
         </li>
+
         <li class="nav-item">
             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                 <button type="submit" class="nav-link btn btn-link" style="border: 1px solid black; border-radius: 20px; padding: 8px 20px; transition: background-color 0.3s; color:black" onmouseover="this.style.borderColor='transparent';this.style.backgroundColor='#D2042D'; this.style.color='white';" onmouseout="this.style.borderColor='black';this.style.backgroundColor=''; this.style.color='black';">

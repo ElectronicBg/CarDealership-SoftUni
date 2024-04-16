@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+[Area("Admin")]
 [Authorize(Roles = "Admin")]
 public class PhotoController : Controller
 {

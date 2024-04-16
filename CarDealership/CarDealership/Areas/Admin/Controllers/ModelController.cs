@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using CarDealership.Services.Model;
 using CarDealership.Models.ModelViewModels;
 
+[Area("Admin")]
 [Authorize(Roles = "Admin")]
 public class ModelController : Controller
 {

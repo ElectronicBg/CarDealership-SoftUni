@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using CarDealership.Services.Color;
 using CarDealership.Models.ColorViewModels;
 
+[Area("Admin")]
 [Authorize(Roles = "Admin")]
 public class ColorController : Controller
 {
