@@ -1,17 +1,18 @@
-﻿@model CarDealership.Data.Brand
+﻿@using CarDealership.Models.BrandViewModels
+@model EditBrandViewModel
 @{
     ViewData["Title"] = "Edit Brand";
 }
 
 <div class="container" style="min-height:75vh;">
     <h2>Редактирай Марка</h2>
-    <form method="post" asp-action="Edit">
-        <input type="hidden" asp-for="BrandId" />
+    <form method="post" asp-action="EditPost">
+        <input type="hidden" asp-for="Brand.BrandId" />
 
         <div class="form-group">
-            <label asp-for="Name" class="form-label">Име</label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <label asp-for="Brand.Name" class="form-label">Име</label>
+            <input asp-for="Brand.Name" class="form-control" />
+            <span asp-validation-for="Brand.Name" class="text-danger"></span>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Обнови Марка</button>

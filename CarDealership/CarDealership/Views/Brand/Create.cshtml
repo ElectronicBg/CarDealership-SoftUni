@@ -1,4 +1,5 @@
-﻿@model CarDealership.Data.Brand
+﻿@using CarDealership.Models.BrandViewModels
+@model CreateBrandViewModel
 @{
     ViewData["Title"] = "Add Brand";
 }
@@ -7,9 +8,9 @@
     <h2>Добави Марка</h2>
     <form method="post" asp-action="Create">
         <div class="form-group">
-            <label asp-for="Name" class="form-label">Име</label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <label asp-for="@Model.Brand.Name" class="form-label">Име</label>
+            <input asp-for="@Model.Brand.Name" class="form-control" />
+            <span asp-validation-for="@Model.Brand.Name" class="text-danger"></span>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Създай Марка</button>

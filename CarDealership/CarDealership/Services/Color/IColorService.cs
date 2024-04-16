@@ -1,13 +1,14 @@
 ﻿using CarDealership.Data;
+using CarDealership.Models.ColorViewModels;
 
 namespace CarDealership.Services.Color
 {
     public interface IColorService
     {
         Task<List<CarColor>> GetAllCarColorsAsync();
-        Task<bool> CreateCarColorAsync(CarColor carColor);
+        Task<bool> CreateCarColorAsync(CreateColorViewModel createCarColorViewModel);
         Task<CarColor> GetCarColorByIdAsync(int id);
-        Task<bool> UpdateCarColorAsync(int id, CarColor carColor);
+        Task<bool> UpdateCarColorAsync(EditColorViewModel editColorViewModel);
         Task<bool> CarColorExistsAsync(int id);
     }
 }

@@ -1,25 +1,26 @@
-﻿@model CarDealership.Data.Model
+﻿@using CarDealership.Models.ModelViewModels
+@model EditModelViewModel
 @{
     ViewData["Title"] = "Edit Model";
 }
 
 <div class="container" style="min-height:75vh;">
     <h2>Редактирай Модел</h2>
-    <form method="post" asp-action="Edit">
-        <input type="hidden" asp-for="ModelId" />
+    <form method="post" asp-action="EditPost">
+        <input type="hidden" asp-for="Model.ModelId" />
 
         <div class="form-group">
-            <label asp-for="Name" class="form-label">Име</label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <label asp-for="Model.Name" class="form-label">Име</label>
+            <input asp-for="Model.Name" class="form-control" />
+            <span asp-validation-for="Model.Name" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="Brand" class="form-label">Марка</label>
-            <select asp-for="BrandId" asp-items="@(new SelectList(ViewBag.Brands, "BrandId", "Name"))" class="form-control">
+            <label asp-for="Model.Brand" class="form-label">Марка</label>
+            <select asp-for="Model.BrandId" asp-items="@(new SelectList(ViewBag.Brands, "BrandId", "Name"))" class="form-control">
                 <option value="">Избери Марка</option>
             </select>
-            <span asp-validation-for="BrandId" class="text-danger"></span>
+            <span asp-validation-for="Model.BrandId" class="text-danger"></span>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Обнови Модела</button>

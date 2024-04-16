@@ -2,6 +2,7 @@
 using CarDealership.Data;
 using Microsoft.AspNetCore.Authorization;
 using CarDealership.Services.Color;
+using CarDealership.Models.ColorViewModels;
 
 [Authorize(Roles = "Admin")]
 public class ColorController : Controller
@@ -28,47 +29,43 @@ public class ColorController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CarColor carColor)
+    public async Task<IActionResult> Create(CreateColorViewModel createCarColorViewModel)
     {
         if (ModelState.IsValid)
         {
-            await _carColorService.CreateCarColorAsync(carColor);
+            await _carColorService.CreateCarColorAsync(createCarColorViewModel);
             return RedirectToAction(nameof(Index));
         }
 
-        return View(carColor);
+        return View(createCarColorViewModel);
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(int? id)
+    public async Task<IActionResult> Edit(EditColorViewModel editColorViewModel)
     {
-        if (id == null)
+        if (editColorViewModel.Id == null)
         {
             return NotFound();
         }
 
-        var carColor = await _carColorService.GetCarColorByIdAsync(id.Value);
+         editColorViewModel.CarColor = await _carColorService.GetCarColorByIdAsync(editColorViewModel.Id.Value);
 
-        if (carColor == null)
+        if (editColorViewModel.CarColor == null)
         {
             return NotFound();
         }
 
-        return View(carColor);
+        return View(editColorViewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, CarColor carColor)
+    public async Task<IActionResult> EditPost(EditColorViewModel editColorViewModel)
     {
-        if (id != carColor.CarColorId)
-        {
-            return NotFound();
-        }
 
         if (ModelState.IsValid)
         {
-            var isSuccess = await _carColorService.UpdateCarColorAsync(id, carColor);
+            var isSuccess = await _carColorService.UpdateCarColorAsync(editColorViewModel);
             if (isSuccess)
             {
                 return RedirectToAction(nameof(Index));
@@ -79,7 +76,7 @@ public class ColorController : Controller
             }
         }
 
-        return View(carColor);
+        return View("Edit",editColorViewModel);
     }
 
     private async Task<bool> ColorExists(int id)

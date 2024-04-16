@@ -1,22 +1,23 @@
-﻿@model CarDealership.Data.CarColor
+﻿@using CarDealership.Models.ColorViewModels
+@model EditColorViewModel
 @{
     ViewData["Title"] = "Edit Color";
 }
 <div class="container" style="min-height:75vh;">
     <h2>Редактирай Цвета</h2>
-    <form method="post" asp-action="Edit">
-        <input type="hidden" asp-for="CarColorId" />
+    <form method="post" asp-action="EditPost">
+        <input type="hidden" asp-for="CarColor.CarColorId" />
 
         <div class="form-group">
-            <label asp-for="Name" class="form-label">Име</label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <label asp-for="CarColor.Name" class="form-label">Име</label>
+            <input asp-for="CarColor.Name" class="form-control" />
+            <span asp-validation-for="CarColor.Name" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="Value" class="form-label">HEX Стойност</label>
-            <input asp-for="Value" class="form-control" />
-            <span asp-validation-for="Value" class="text-danger"></span>
+            <label asp-for="CarColor.Value" class="form-label">HEX Стойност</label>
+            <input asp-for="CarColor.Value" class="form-control" />
+            <span asp-validation-for="CarColor.Value" class="text-danger"></span>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Обнови Цвета</button>

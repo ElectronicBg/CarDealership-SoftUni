@@ -1,4 +1,5 @@
 ﻿using CarDealership.Data;
+using CarDealership.Models.BrandViewModels;
 using CarDealership.Services.Brand;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,45 +29,41 @@ public class BrandController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Brand brand)
+    public async Task<IActionResult> Create( CreateBrandViewModel brandViewModel)
     {
         if (ModelState.IsValid)
         {
-            await _brandService.CreateBrandAsync(brand);
+            await _brandService.CreateBrandAsync(brandViewModel);
             return RedirectToAction(nameof(Index));
         }
-        return View(brand);
+        return View(brandViewModel);
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(int? id)
+    public async Task<IActionResult> Edit(EditBrandViewModel editBrandViewModel)
     {
-        if (id == null)
+        if (editBrandViewModel.Id == null)
         {
             return NotFound();
         }
 
-        var brand = await _brandService.GetBrandByIdAsync(id.Value);
-        if (brand == null)
+        editBrandViewModel.Brand = await _brandService.GetBrandByIdAsync(editBrandViewModel.Id.Value);
+        if (editBrandViewModel.Brand == null)
         {
             return NotFound();
         }
 
-        return View(brand);
+        return View(editBrandViewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, Brand brand)
+    public async Task<IActionResult> EditPost(EditBrandViewModel editBrandViewModel)
     {
-        if (id != brand.BrandId)
-        {
-            return NotFound();
-        }
 
         if (ModelState.IsValid)
         {
-            var isSuccess = await _brandService.UpdateBrandAsync(id, brand);
+            var isSuccess = await _brandService.UpdateBrandAsync(editBrandViewModel);
             if (isSuccess)
             {
                 return RedirectToAction(nameof(Index));
@@ -76,7 +73,7 @@ public class BrandController : Controller
                 return NotFound();
             }
         }
-        return View(brand);
+        return View("Edit",editBrandViewModel);
     }
 
     private async Task<bool> BrandExists(int id)

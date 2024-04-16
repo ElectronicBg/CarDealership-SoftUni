@@ -1,4 +1,5 @@
 ﻿using CarDealership.Data;
+using CarDealership.Models.ColorViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarDealership.Services.Color
@@ -17,9 +18,9 @@ namespace CarDealership.Services.Color
             return await _context.CarColors.ToListAsync();
         }
 
-        public async Task<bool> CreateCarColorAsync(CarColor carColor)
+        public async Task<bool> CreateCarColorAsync(CreateColorViewModel createCarColorViewModel)
         {
-            _context.CarColors.Add(carColor);
+            _context.CarColors.Add(createCarColorViewModel.CarColor);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -29,14 +30,10 @@ namespace CarDealership.Services.Color
             return await _context.CarColors.FindAsync(id);
         }
 
-        public async Task<bool> UpdateCarColorAsync(int id, CarColor carColor)
+        public async Task<bool> UpdateCarColorAsync(EditColorViewModel editColorViewModel)
         {
-            if (id != carColor.CarColorId)
-            {
-                return false;
-            }
 
-            _context.Entry(carColor).State = EntityState.Modified;
+            _context.Entry(editColorViewModel.CarColor).State = EntityState.Modified;
 
             try
             {
@@ -44,7 +41,7 @@ namespace CarDealership.Services.Color
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await CarColorExistsAsync(carColor.CarColorId))
+                if (!await CarColorExistsAsync(editColorViewModel.CarColor.CarColorId))
                 {
                     return false;
                 }

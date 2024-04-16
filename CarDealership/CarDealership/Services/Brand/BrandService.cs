@@ -1,4 +1,5 @@
 ﻿using CarDealership.Data;
+using CarDealership.Models.BrandViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarDealership.Services.Brand
@@ -16,9 +17,9 @@ namespace CarDealership.Services.Brand
             return await _context.Brands.ToListAsync();
         }
 
-        public async Task<bool> CreateBrandAsync(Data.Brand brand)
+        public async Task<bool> CreateBrandAsync(CreateBrandViewModel brand)
         {
-            _context.Brands.Add(brand);
+            _context.Brands.Add(brand.Brand);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -28,14 +29,9 @@ namespace CarDealership.Services.Brand
             return await _context.Brands.FindAsync(id);
         }
 
-        public async Task<bool> UpdateBrandAsync(int id, Data.Brand brand)
+        public async Task<bool> UpdateBrandAsync(EditBrandViewModel editBrandViewModel)
         {
-            if (id != brand.BrandId)
-            {
-                return false;
-            }
-
-            _context.Entry(brand).State = EntityState.Modified;
+            _context.Entry(editBrandViewModel.Brand).State = EntityState.Modified;
 
             try
             {
@@ -43,7 +39,7 @@ namespace CarDealership.Services.Brand
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await BrandExistsAsync(brand.BrandId))
+                if (!await BrandExistsAsync(editBrandViewModel.Brand.BrandId))
                 {
                     return false;
                 }
