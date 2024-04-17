@@ -69,41 +69,6 @@ public class PhotoController : Controller
         return BadRequest("No photo URLs provided");
     }
 
-    // POST: Photo/Edit/5
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, Photo photo)
-    {
-        if (id != photo.PhotoId)
-        {
-            return NotFound();
-        }
-
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                _context.Entry(photo).State = EntityState.Modified;
-                _context.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PhotoExists(photo.PhotoId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction(nameof(Index));
-        }
-
-        ViewBag.Cars = _context.Cars.ToList();
-        return View(photo);
-    }
-
     // POST: Photo/Delete/5
     [HttpPost]
     [Route("Admin/Photo/Delete/{photoId}")]
