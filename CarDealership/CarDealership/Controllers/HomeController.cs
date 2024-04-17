@@ -1,6 +1,7 @@
 using CarDealership.Data;
 using CarDealership.Models;
 using CarDealership.ViewModel;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -32,13 +33,37 @@ namespace CarDealership.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+			throw new ArgumentException(nameof(Privacy));
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
+		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		public IActionResult Error()
+		{
+			var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+			if (exceptionHandlerPathFeature is not null && exceptionHandlerPathFeature.Error is not null)
+			{
+				_logger.LogError(exceptionHandlerPathFeature.Error, "Unhandled exception.");
+
+			}
+
+			return exceptionHandlerPathFeature switch
+			{
+				ArgumentException => this.RedirectToAction("Error404"),
+				_ => this.RedirectToAction("Error500"),
+			};
+		}
+
+		[HttpGet]
+		public IActionResult Error404()
+		{
+			return this.View();
+		}
+
+		[HttpGet]
+		public IActionResult Error500()
+		{
+			return this.View();
+		}
+
+	}
 }
