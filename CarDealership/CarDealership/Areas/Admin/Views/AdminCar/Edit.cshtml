@@ -9,7 +9,7 @@
     <h2>Редактирай Колата</h2>
     <div class="row d-flex">
         <div class="col-6">
-            <form method="post" asp-controller="Car" asp-action="Edit">
+            <form method="post" asp-controller="AdminCar" asp-action="Edit">
                 <div class="form-group">
                     <label asp-for="BrandId" class="form-label">Марка</label>
                     <select asp-for="BrandId" asp-items="@(new SelectList(ViewBag.Brands, "BrandId", "Name"))" class="form-control" id="brandDropdown">
@@ -137,7 +137,8 @@
 
                 if (brandId) {
                     // Use Url.Action to generate the correct URL
-                    var url = '@Url.Action("GetModels", "Car")/' + brandId;
+                    var baseUrl = window.location.origin;
+                    var url = baseUrl + '/Car/GetModels/' + brandId;
 
                     // Fetch models based on the selected brand
                     $.getJSON(url, function (models) {
@@ -183,7 +184,7 @@
                 // Send an AJAX request to add the photos to the current car
                 $.ajax({
                     type: 'POST',
-                    url: '/Photo/AddToCar',
+                    url: '/Admin/Photo/AddToCar',
                     data: { carId: currentCarId, photoUrls: photo },
                     traditional: true,
                     success: function () {
@@ -202,7 +203,7 @@
                 var photoId = $(this).data('photo-id');
 
                 $.ajax({
-                    url: '/Photo/Delete/' + photoId,
+                    url: '/Admin/Photo/Delete/' + photoId,
                     type: 'POST',
                     success: function (result) {
                         window.location.reload();

@@ -26,7 +26,7 @@ background: linear-gradient(0deg, rgba(255,255,255,0.9921102229954482) 0%, rgba(
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Car" asp-action="Index">Коли</a>
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="AdminCar" asp-action="Index">Коли</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="Admin" asp-controller="Brand" asp-action="Index">Марки</a>

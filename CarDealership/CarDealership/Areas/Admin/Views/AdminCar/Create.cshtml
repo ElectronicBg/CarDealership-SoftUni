@@ -8,7 +8,7 @@
     <h2>Добави Кола</h2>
     <div class="row d-flex">
         <div class="col-6">
-            <form method="post" asp-action="Create" asp-controller="Car" id="carForm">
+            <form method="post" asp-action="Create" asp-controller="AdminCar" id="carForm">
                 <div>
                     <label asp-for="@Model.Car.Brand">Марка</label>
                     <select asp-for="@Model.Car.BrandId" asp-items="@(new SelectList(ViewBag.Brands, "BrandId", "Name"))" class="form-control" id="brandDropdown">
@@ -116,7 +116,8 @@
 
             if (brandId) {
                 // Use Url.Action to generate the correct URL
-                var url = '@Url.Action("GetModels", "Car")/' + brandId;
+                var baseUrl = window.location.origin; 
+                var url = baseUrl + '/Car/GetModels/' + brandId;
 
                 // Fetch models based on the selected brand
                 $.getJSON(url, function (models) {
@@ -180,7 +181,7 @@
                     // Perform the AJAX request
                     $.ajax({
                         type: "POST",
-                        url: "/Car/Create",
+                        url: "/Admin/AdminCar/Create",
                         data: viewModel,
                         dataType: "json",
                         success: function (data) {

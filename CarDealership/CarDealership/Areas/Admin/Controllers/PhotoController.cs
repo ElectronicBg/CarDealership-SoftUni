@@ -106,7 +106,7 @@ public class PhotoController : Controller
 
     // POST: Photo/Delete/5
     [HttpPost]
-    [Route("Photo/Delete/{photoId}")]
+    [Route("Admin/Photo/Delete/{photoId}")]
     public IActionResult Delete(int photoId)  
     {
         var photo = _context.Photos.Find(photoId);

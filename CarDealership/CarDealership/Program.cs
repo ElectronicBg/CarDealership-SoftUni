@@ -65,7 +65,7 @@ app.UseEndpoints(endpoints =>
 
     endpoints.MapControllerRoute(
     name: "DeletePhoto",
-    pattern: "Photo/Delete/{photoId}",
+    pattern: "Admin/Photo/Delete/{photoId}",
     defaults: new { controller = "Photo", action = "Delete" }
 );
 

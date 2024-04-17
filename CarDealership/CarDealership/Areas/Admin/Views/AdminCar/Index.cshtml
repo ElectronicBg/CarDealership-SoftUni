@@ -11,7 +11,7 @@
 
 <div class="container">
     <div class="d-flex justify-content-end mb-3">
-        <a asp-action="Create" asp-controller="Car" class="btn btn-success d-flex align-items-center border-0" style="background-color:#3DC26A">
+        <a asp-action="Create" asp-controller="AdminCar" class="btn btn-success d-flex align-items-center border-0" style="background-color:#3DC26A">
             Добави Нова Кола
             <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" class="ps-2" viewBox="0 0 448 512"><path fill="#ffffff" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" /></svg>
         </a>
@@ -83,7 +83,7 @@
         }
     </div>
     <div class="row">
-        <form asp-action="Index" asp-controller="Car" method="post" id="paginationForm">
+        <form asp-action="Index" asp-controller="AdminCar" method="post" id="paginationForm">
             <input type="hidden" name="pageNumber" id="pageNumberInput" value="@(ViewBag.CurrentPage)" />
             <input type="hidden" name="pageSize" value="@(ViewBag.PageSize)" />
             <div class="d-flex gap-2 justify-content-center">
