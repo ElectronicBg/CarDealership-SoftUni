@@ -4,7 +4,6 @@ using CarDealership.Services.Brand;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
-using System.Linq.Expressions;
 
 public class BrandServiceTests
 {
@@ -26,6 +25,7 @@ public class BrandServiceTests
                 new Brand { BrandId = 1, Name = "Brand1" },
                 new Brand { BrandId = 2, Name = "Brand2" }
         }.AsQueryable();
+
         var mock=data.BuildMockDbSet();
 
         _mockContext.Setup(m => m.Brands).Returns(mock.Object);
@@ -78,26 +78,7 @@ public class BrandServiceTests
 
         // Assert
         Assert.That(result, Is.EqualTo(brand));
-    }
-
-    [Test]
-    public async Task UpdateBrandAsync_ReturnsTrueWhenBrandIsUpdated()
-    {
-        // Arrange
-        var editBrandViewModel = new EditBrandViewModel
-        {
-            Brand = new Brand { BrandId = 1, Name = "UpdatedBrand" }
-        };
-
-        _mockContext.Setup(m => m.Entry(editBrandViewModel.Brand)).Returns(Mock.Of<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<Brand>>());
-
-        // Act
-        var result = await _brandService.UpdateBrandAsync(editBrandViewModel);
-
-        // Assert
-        Assert.True(result);
-        _mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
-    }
+    } 
 
     [Test]
     public async Task BrandExistsAsync_ReturnsTrueWhenBrandExists()
@@ -146,5 +127,34 @@ public class BrandServiceTests
 
         // Assert
         Assert.False(result);
+    }
+    [Test]
+    public async Task UpdateBrandAsync_ReturnsTrueWhenBrandIsUpdated()
+    {
+        // Arrange
+        var editBrandViewModel = new EditBrandViewModel
+        {
+            Brand = new Brand
+            {
+                BrandId = 1,
+                Name = "UpdatedBrandName"
+            }
+        };
+
+        var existingBrand = new Brand
+        {
+            BrandId = 1,
+            Name = "ExistingBrandName"
+        };
+
+        var mockSet = new Mock<DbSet<Brand>>();
+        mockSet.Setup(m => m.FindAsync(It.IsAny<int>())).ReturnsAsync(existingBrand);
+
+        // Act
+        var result = await _brandService.UpdateBrandAsync(editBrandViewModel);
+
+        // Assert
+        Assert.True(result);
+        _mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
     }
 }

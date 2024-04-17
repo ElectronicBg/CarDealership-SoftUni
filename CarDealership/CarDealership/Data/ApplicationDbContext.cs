@@ -6,6 +6,9 @@ namespace CarDealership.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        public ApplicationDbContext()      
+        {
+        }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -20,10 +23,10 @@ namespace CarDealership.Data
 
             base.OnModelCreating(modelBuilder);
         }
-        public DbSet<Car> Cars { get; set; }
-        public DbSet<Brand> Brands { get; set; }
-        public DbSet<Model> Models { get; set; }
-        public DbSet<CarColor> CarColors { get; set; }
-        public DbSet<Photo> Photos { get; set; }
+        public virtual DbSet<Car> Cars { get; set; }
+        public virtual DbSet<Brand> Brands { get; set; }
+        public virtual DbSet<Model> Models { get; set; }
+        public virtual DbSet<CarColor> CarColors { get; set; }
+        public virtual DbSet<Photo> Photos { get; set; }
     }
 }
