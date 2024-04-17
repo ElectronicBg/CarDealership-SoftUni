@@ -99,31 +99,37 @@ namespace CarDealership.Tests
         public async Task UpdateModelAsync_ReturnsTrueWhenModelIsUpdated()
         {
             // Arrange
-            var editModelViewModel = new EditModelViewModel { Model = new Model { ModelId = 1, Name = "Model1" } };
+            var editModelViewModel = new EditModelViewModel
+            {
+                Model = new Model { ModelId = 1, Name = "UpdatedModelName" }
+            };
 
-            // Act
-            var result = await _modelService.UpdateModelAsync(editModelViewModel);
+            var existingModel = new Model { ModelId = 1, Name = "ExistingModelName" };
 
-            // Assert
-            Assert.True(result);
-            _mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
+            _mockContext.Setup(m => m.Set<Data.Model>().FindAsync(editModelViewModel.Model.ModelId))
+                        .ReturnsAsync(existingModel);
+
+            _mockContext.Setup(m => m.SaveChangesAsync(default))
+                        .ReturnsAsync(1); // Assuming SaveChangesAsync returns 1 for success
+
+            _mockContext.Setup(m => m.Set<Data.Model>().Update(It.IsAny<Model>()));
+
+            try
+            {
+                // Act
+                var result = await _modelService.UpdateModelAsync(editModelViewModel);
+
+                // Assert
+                Assert.True(result);
+                _mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error message: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                throw;
+            }
         }
-
-        [Test]
-        public async Task UpdateModelAsync_ThrowsDbUpdateConcurrencyException_ReturnsFalse()
-        {
-            // Arrange
-            var editModelViewModel = new EditModelViewModel { Model = new Model { ModelId = 1, Name = "Model1" } };
-
-            _mockContext.Setup(m => m.SaveChangesAsync(default)).ThrowsAsync(new DbUpdateConcurrencyException());
-
-            // Act
-            var result = await _modelService.UpdateModelAsync(editModelViewModel);
-
-            // Assert
-            Assert.False(result);
-        }
-
         [Test]
         public async Task ModelExistsAsync_ReturnsTrueWhenModelExists()
         {

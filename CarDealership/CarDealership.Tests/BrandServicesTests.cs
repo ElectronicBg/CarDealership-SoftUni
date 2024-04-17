@@ -134,27 +134,34 @@ public class BrandServiceTests
         // Arrange
         var editBrandViewModel = new EditBrandViewModel
         {
-            Brand = new Brand
-            {
-                BrandId = 1,
-                Name = "UpdatedBrandName"
-            }
+            Brand = new Brand { BrandId = 1, Name = "UpdatedBrandName" }
         };
 
-        var existingBrand = new Brand
+        var existingBrand = new Brand { BrandId = 1, Name = "ExistingBrandName" };
+
+        _mockContext.Setup(m => m.Set<Brand>().FindAsync(editBrandViewModel.Brand.BrandId))
+                    .ReturnsAsync(existingBrand);
+
+        _mockContext.Setup(m => m.SaveChangesAsync(default))
+                    .ReturnsAsync(1); // Assuming SaveChangesAsync returns 1 for success
+
+        _mockContext.Setup(m => m.Set<Brand>().Update(It.IsAny<Brand>()));
+
+        try
         {
-            BrandId = 1,
-            Name = "ExistingBrandName"
-        };
+            // Act
+            var result = await _brandService.UpdateBrandAsync(editBrandViewModel);
 
-        var mockSet = new Mock<DbSet<Brand>>();
-        mockSet.Setup(m => m.FindAsync(It.IsAny<int>())).ReturnsAsync(existingBrand);
-
-        // Act
-        var result = await _brandService.UpdateBrandAsync(editBrandViewModel);
-
-        // Assert
-        Assert.True(result);
-        _mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
+            // Assert
+            Assert.True(result);
+            _mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error message: {ex.Message}");
+            Console.WriteLine($"StackTrace: {ex.StackTrace}");
+            throw;
+        }
     }
 }
+

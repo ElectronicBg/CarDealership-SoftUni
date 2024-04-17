@@ -46,24 +46,37 @@ namespace CarDealership.Services.Model
 
         public async Task<bool> UpdateModelAsync(EditModelViewModel editModelViewModel)
         {
-            _context.Entry(editModelViewModel.Model).State = EntityState.Modified;
-
             try
             {
+                var existingModel = await _context.Set<Data.Model>().FindAsync(editModelViewModel.Model.ModelId);
+
+                if (existingModel == null)
+                {
+                    return false; // Model not found
+                }
+
+                existingModel.Name = editModelViewModel.Model.Name; // Update properties as needed
+
                 await _context.SaveChangesAsync();
+
+                return true; // Successfully updated
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!await ModelExistsAsync(editModelViewModel.Model.ModelId))
                 {
-                    return false;
+                    return false; // Model not found
                 }
                 else
                 {
-                    throw;
+                    throw; // Concurrency exception
                 }
             }
-            return true;
+            catch (Exception ex)
+            {
+                // Log or handle the exception as needed
+                throw new Exception("An error occurred while updating the model.", ex);
+            };
         }
 
         public async Task<bool> ModelExistsAsync(int id)

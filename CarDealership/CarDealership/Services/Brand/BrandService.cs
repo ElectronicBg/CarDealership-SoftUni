@@ -1,6 +1,7 @@
 ﻿using CarDealership.Data;
 using CarDealership.Models.BrandViewModels;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing.Drawing2D;
 
 namespace CarDealership.Services.Brand
 {
@@ -31,24 +32,37 @@ namespace CarDealership.Services.Brand
 
         public async Task<bool> UpdateBrandAsync(EditBrandViewModel editBrandViewModel)
         {
-            _context.Entry(editBrandViewModel.Brand).State = EntityState.Modified;
-
             try
             {
+                var existingBrand = await _context.Set<Data.Brand>().FindAsync(editBrandViewModel.Brand.BrandId);
+
+                if (existingBrand == null)
+                {
+                    return false; // Brand not found
+                }
+
+                existingBrand.Name = editBrandViewModel.Brand.Name; // Update properties as needed
+
                 await _context.SaveChangesAsync();
+
+                return true; // Successfully updated
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!await BrandExistsAsync(editBrandViewModel.Brand.BrandId))
                 {
-                    return false;
+                    return false; // Brand not found
                 }
                 else
                 {
-                    throw;
+                    throw; // Concurrency exception
                 }
             }
-            return true;
+            catch (Exception ex)
+            {
+                // Log or handle the exception as needed
+                throw new Exception("An error occurred while updating the brand.", ex);
+            }
         }
 
         public async Task<bool> BrandExistsAsync(int id)
