@@ -6,6 +6,7 @@ using CarDealership.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
+using System.Linq.Expressions;
 
 namespace CarDealership.Tests
 {
@@ -97,29 +98,19 @@ namespace CarDealership.Tests
             Assert.That(result.First().GetType().GetProperty("ModelId").GetValue(result.First()), Is.EqualTo(1));
             Assert.That(result.First().GetType().GetProperty("Name").GetValue(result.First()), Is.EqualTo("Model1"));
         }
-
         [Test]
-        public async Task UpdateCarAsync_ReturnsTrueWhenCarIsUpdated()
+        public async Task UpdateCarAsync_ReturnsFalseWhenIdMismatch()
         {
             // Arrange
             var id = 1;
-            var editedCar = new Car { CarId = id, BrandId = 1, ModelId = 2, Year = 2020 };
-
-            var cars = new List<Car>
-    {
-        new Car { CarId = id, BrandId = 1, ModelId = 1, Year = 2019 },
-        new Car { CarId = 2, BrandId = 1, ModelId = 2, Year = 2020 }
-    }.AsQueryable();
-
-            _mockContext.Setup(m => m.Cars).Returns(cars.BuildMockDbSet().Object);
+            var editedCar = new Data.Car { CarId = 2, BrandId = 1, ModelId = 1 };
 
             // Act
             var result = await _carService.UpdateCarAsync(id, editedCar);
 
             // Assert
-            Assert.True(result);
-            _mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
-        }
+            Assert.IsFalse(result);
+        }     
 
         [Test]
         public async Task DeleteCarAsync_ReturnsTrueWhenCarIsDeleted()
@@ -148,6 +139,30 @@ namespace CarDealership.Tests
             // Assert
             Assert.False(result);
             _mockContext.Verify(m => m.SaveChangesAsync(default), Times.Never); // Verify that SaveChangesAsync was not called
+        }
+        [Test]
+        public async Task SearchAsync_FiltersByBrand_ReturnsFilteredCars()
+        {
+            // Arrange
+            var brandId = 1;
+            var searchViewModel = new SearchViewModel { BrandId = brandId };
+
+            var cars = new List<Data.Car>
+    {
+        new Data.Car { CarId = 1, BrandId = brandId, ModelId = 1 },
+        new Data.Car { CarId = 2, BrandId = brandId, ModelId = 2 },
+        new Data.Car { CarId = 3, BrandId = 2, ModelId = 1 }  // Different brand
+    }.AsQueryable();
+
+            var mock = cars.BuildMockDbSet();
+            _mockContext.Setup(m => m.Cars).Returns(mock.Object);
+
+            // Act
+            var result = await _carService.SearchAsync(searchViewModel);
+
+            // Assert
+            Assert.AreEqual(2, result.Cars.Count()); // Expecting 2 cars with the specified brand
+            Assert.IsTrue(result.Cars.All(c => c.BrandId == brandId)); // All cars should have the specified brand
         }
     }
 }

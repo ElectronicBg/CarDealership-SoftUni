@@ -1,6 +1,7 @@
 ﻿using CarDealership.Data;
 using CarDealership.Models.ColorViewModels;
 using CarDealership.Services.Color;
+using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
 
@@ -69,23 +70,50 @@ namespace CarDealership.Tests
         }
 
         [Test]
-        public async Task UpdateCarColorAsync_ReturnsTrueWhenCarColorIsUpdated()
+        public async Task UpdateCarColorAsync_ReturnsFalseWhenColorNotFound()
         {
             // Arrange
-            var editColorViewModel = new EditColorViewModel { CarColor = new CarColor { CarColorId = 1, Name = "Red" } };
+            var editColorViewModel = new EditColorViewModel
+            {
+                CarColor = new CarColor { CarColorId = 1, Name = "UpdatedColor" }
+            };
 
-            // Set up the mock context to return the car color from the database
-
-            _mockContext.Setup(m => m.CarColors.FindAsync(editColorViewModel.CarColor.CarColorId))
-
-                .ReturnsAsync(editColorViewModel.CarColor);
+            _mockContext.Setup(m => m.Set<CarColor>().FindAsync(editColorViewModel.CarColor.CarColorId))
+                .ReturnsAsync((CarColor)null);
 
             // Act
             var result = await _carColorService.UpdateCarColorAsync(editColorViewModel);
 
             // Assert
-            Assert.True(result);
-            _mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
+            Assert.IsFalse(result);
+        }
+      
+
+        [Test]
+        public async Task UpdateCarColorAsync_ReturnsTrueWhenColorIsUpdated()
+        {
+            // Arrange
+            var colorId = 1;
+            var updatedName = "UpdatedColor";
+
+            var existingColor = new CarColor { CarColorId = colorId, Name = "OldColor" };
+
+            _mockContext.Setup(m => m.Set<CarColor>().FindAsync(colorId))
+                .ReturnsAsync(existingColor);
+
+            var editColorViewModel = new EditColorViewModel
+            {
+                CarColor = new CarColor { CarColorId = colorId, Name = updatedName }
+            };
+
+            // Act
+            var result = await _carColorService.UpdateCarColorAsync(editColorViewModel);
+
+            // Assert
+            Assert.IsTrue(result);
+
+            // Verify the updated name
+            Assert.AreEqual(updatedName, existingColor.Name);
         }
 
         [Test]

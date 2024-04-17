@@ -33,24 +33,37 @@ namespace CarDealership.Services.Color
         public async Task<bool> UpdateCarColorAsync(EditColorViewModel editColorViewModel)
         {
 
-            _context.Entry(editColorViewModel.CarColor).State = EntityState.Modified;
-
             try
             {
+                var existingColor = await _context.Set<CarColor>().FindAsync(editColorViewModel.CarColor.CarColorId);
+
+                if (existingColor == null)
+                {
+                    return false; // Color not found
+                }
+
+                existingColor.Name = editColorViewModel.CarColor.Name; // Update properties as needed
+
                 await _context.SaveChangesAsync();
+
+                return true; // Successfully updated
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!await CarColorExistsAsync(editColorViewModel.CarColor.CarColorId))
                 {
-                    return false;
+                    return false; // Color not found
                 }
                 else
                 {
-                    throw;
+                    throw; // Concurrency exception
                 }
             }
-            return true;
+            catch (Exception ex)
+            {
+                // Log or handle the exception as needed
+                throw new Exception("An error occurred while updating the color.", ex);
+            }
         }
 
         public async Task<bool> CarColorExistsAsync(int id)
