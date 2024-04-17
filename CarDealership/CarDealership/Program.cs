@@ -5,6 +5,7 @@ using CarDealership.Services.Car;
 using CarDealership.Services.Color;
 using CarDealership.Services.Model;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,12 @@ builder.Services.AddScoped<ICarService,CarService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IModelService, ModelService>();
 builder.Services.AddScoped<IColorService, ColorService>();
+
+//Breaks the AJAXes
+/*builder.Services.AddControllersWithViews(options =>
+{
+	options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+});*/
 
 var app = builder.Build();
 
